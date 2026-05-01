@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Core.Authentication;
 using NzbDrone.Core.Configuration;
@@ -66,6 +67,53 @@ namespace Readarr.Api.V1.Config
             SharedValidator.RuleFor(c => c.BackupFolder).IsValidPath().When(c => Path.IsPathRooted(c.BackupFolder));
             SharedValidator.RuleFor(c => c.BackupInterval).InclusiveBetween(1, 7);
             SharedValidator.RuleFor(c => c.BackupRetention).InclusiveBetween(1, 90);
+        }
+
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            // When only auth fields are submitted (e.g. first-run setup modal), required
+            // non-auth fields arrive as zero/empty.  Back-fill from the current config so
+            // validators don't fire on unrelated fields.
+            if (Request.Method == "PUT")
+            {
+                foreach (var value in context.ActionArguments.Values)
+                {
+                    if (value is HostConfigResource resource)
+                    {
+                        if (resource.Id == 0)
+                        {
+                            resource.Id = 1;
+                        }
+
+                        if (resource.Port == 0)
+                        {
+                            resource.Port = _configFileProvider.Port;
+                        }
+
+                        if (resource.BindAddress.IsNullOrWhiteSpace())
+                        {
+                            resource.BindAddress = _configFileProvider.BindAddress;
+                        }
+
+                        if (resource.Branch.IsNullOrWhiteSpace())
+                        {
+                            resource.Branch = _configFileProvider.Branch;
+                        }
+
+                        if (resource.BackupInterval == 0)
+                        {
+                            resource.BackupInterval = _configService.BackupInterval;
+                        }
+
+                        if (resource.BackupRetention == 0)
+                        {
+                            resource.BackupRetention = _configService.BackupRetention;
+                        }
+                    }
+                }
+            }
+
+            base.OnActionExecuting(context);
         }
 
         private bool IsValidSslCertificate(HostConfigResource resource)
