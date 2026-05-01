@@ -24,6 +24,7 @@ function AuthenticationRequiredModalContent(props) {
     isPopulated,
     error,
     isSaving,
+    saveError,
     settings,
     onInputChange,
     onSavePress,
@@ -66,6 +67,18 @@ function AuthenticationRequiredModalContent(props) {
         >
           {translate('AuthenticationRequiredWarning')}
         </Alert>
+
+        {
+          saveError ?
+            <Alert kind={kinds.DANGER}>
+              {
+                saveError.responseJSON && saveError.responseJSON.length ?
+                  saveError.responseJSON.map((e) => e.errorMessage).join(', ') :
+                  'Failed to save authentication settings. Check all fields are filled correctly.'
+              }
+            </Alert> :
+            null
+        }
 
         {
           isPopulated && !error ?
