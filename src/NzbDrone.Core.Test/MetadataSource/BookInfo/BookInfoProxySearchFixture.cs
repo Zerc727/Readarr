@@ -15,7 +15,7 @@ using NzbDrone.Test.Common;
 namespace NzbDrone.Core.Test.MetadataSource.Goodreads
 {
     [TestFixture]
-    [Ignore("Waiting for metadata to be back again", Until = "2026-01-15 00:00:00Z")]
+    [Ignore("BookInfoProxy replaced by OpenLibraryProxy; these tests require new OL-based fixtures")]
     public class BookInfoProxySearchFixture : CoreTest<BookInfoProxy>
     {
         [SetUp]

@@ -23,7 +23,8 @@ using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace NzbDrone.Core.MetadataSource.BookInfo
 {
-    public class BookInfoProxy : IProvideAuthorInfo, IProvideBookInfo, ISearchForNewBook, ISearchForNewAuthor, ISearchForNewEntity
+    // Replaced by OpenLibraryProxy. Kept for reference; no longer registered in DI.
+    public class BookInfoProxy
     {
         private static readonly JsonSerializerOptions SerializerSettings = new JsonSerializerOptions
         {
