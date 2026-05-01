@@ -6,7 +6,7 @@ namespace NzbDrone.Core.MetadataSource.OpenLibrary.Resources
     public class OLSearchResponse
     {
         [JsonPropertyName("docs")]
-        public List<OLSearchDoc> Docs { get; set; } = new();
+        public List<OLSearchDoc> Docs { get; set; } = new List<OLSearchDoc>();
 
         [JsonPropertyName("numFound")]
         public int NumFound { get; set; }
@@ -21,10 +21,10 @@ namespace NzbDrone.Core.MetadataSource.OpenLibrary.Resources
         public string Title { get; set; }
 
         [JsonPropertyName("author_key")]
-        public List<string> AuthorKey { get; set; } = new();
+        public List<string> AuthorKey { get; set; } = new List<string>();
 
         [JsonPropertyName("author_name")]
-        public List<string> AuthorName { get; set; } = new();
+        public List<string> AuthorName { get; set; } = new List<string>();
 
         [JsonPropertyName("cover_i")]
         public int? CoverId { get; set; }
@@ -33,13 +33,13 @@ namespace NzbDrone.Core.MetadataSource.OpenLibrary.Resources
         public int? FirstPublishYear { get; set; }
 
         [JsonPropertyName("subject")]
-        public List<string> Subject { get; set; } = new();
+        public List<string> Subject { get; set; } = new List<string>();
 
         [JsonPropertyName("isbn")]
-        public List<string> Isbn { get; set; } = new();
+        public List<string> Isbn { get; set; } = new List<string>();
 
         [JsonPropertyName("language")]
-        public List<string> Language { get; set; } = new();
+        public List<string> Language { get; set; } = new List<string>();
 
         [JsonPropertyName("number_of_pages_median")]
         public int? PageCount { get; set; }

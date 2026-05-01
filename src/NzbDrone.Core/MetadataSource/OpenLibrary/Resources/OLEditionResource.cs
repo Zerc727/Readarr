@@ -12,13 +12,13 @@ namespace NzbDrone.Core.MetadataSource.OpenLibrary.Resources
         public string Title { get; set; }
 
         [JsonPropertyName("isbn_13")]
-        public List<string> Isbn13 { get; set; } = new();
+        public List<string> Isbn13 { get; set; } = new List<string>();
 
         [JsonPropertyName("isbn_10")]
-        public List<string> Isbn10 { get; set; } = new();
+        public List<string> Isbn10 { get; set; } = new List<string>();
 
         [JsonPropertyName("publishers")]
-        public List<string> Publishers { get; set; } = new();
+        public List<string> Publishers { get; set; } = new List<string>();
 
         [JsonPropertyName("publish_date")]
         public string PublishDate { get; set; }
@@ -27,10 +27,10 @@ namespace NzbDrone.Core.MetadataSource.OpenLibrary.Resources
         public int? NumberOfPages { get; set; }
 
         [JsonPropertyName("covers")]
-        public List<int> Covers { get; set; } = new();
+        public List<int> Covers { get; set; } = new List<int>();
 
         [JsonPropertyName("languages")]
-        public List<OLKeyRef> Languages { get; set; } = new();
+        public List<OLKeyRef> Languages { get; set; } = new List<OLKeyRef>();
 
         [JsonPropertyName("description")]
         public OLTextValue Description { get; set; }
@@ -39,7 +39,7 @@ namespace NzbDrone.Core.MetadataSource.OpenLibrary.Resources
         public string PhysicalFormat { get; set; }
 
         [JsonPropertyName("works")]
-        public List<OLKeyRef> Works { get; set; } = new();
+        public List<OLKeyRef> Works { get; set; } = new List<OLKeyRef>();
 
         [JsonPropertyName("identifiers")]
         public OLEditionIdentifiers Identifiers { get; set; }
@@ -48,6 +48,6 @@ namespace NzbDrone.Core.MetadataSource.OpenLibrary.Resources
     public class OLEditionIdentifiers
     {
         [JsonPropertyName("amazon")]
-        public List<string> Amazon { get; set; } = new();
+        public List<string> Amazon { get; set; } = new List<string>();
     }
 }

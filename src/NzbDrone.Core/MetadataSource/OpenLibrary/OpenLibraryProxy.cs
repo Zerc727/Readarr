@@ -23,7 +23,7 @@ namespace NzbDrone.Core.MetadataSource.OpenLibrary
         private const int WorksPerAuthor = 100;
         private const int SearchLimit = 20;
 
-        private static readonly JsonSerializerOptions JsonOptions = new()
+        private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true,
             Converters = { new OLTextValueConverter() }
@@ -52,7 +52,6 @@ namespace NzbDrone.Core.MetadataSource.OpenLibrary
         }
 
         // ── IProvideAuthorInfo ────────────────────────────────────────────
-
         public HashSet<string> GetChangedAuthors(DateTime startTime)
         {
             // OpenLibrary does not provide a changed-since feed — return null
@@ -77,7 +76,6 @@ namespace NzbDrone.Core.MetadataSource.OpenLibrary
         }
 
         // ── IProvideBookInfo ──────────────────────────────────────────────
-
         public Tuple<string, Book, List<AuthorMetadata>> GetBookInfo(string foreignBookId)
         {
             _logger.Debug("Getting book info from OpenLibrary for {0}", foreignBookId);
@@ -118,7 +116,6 @@ namespace NzbDrone.Core.MetadataSource.OpenLibrary
         }
 
         // ── ISearchForNewBook ─────────────────────────────────────────────
-
         public List<Book> SearchForNewBook(string title, string author, bool getAllEditions = true)
         {
             var query = title;
@@ -194,7 +191,6 @@ namespace NzbDrone.Core.MetadataSource.OpenLibrary
         }
 
         // ── ISearchForNewAuthor ───────────────────────────────────────────
-
         public List<Author> SearchForNewAuthor(string title)
         {
             var books = SearchForNewBook(title, null);
@@ -205,7 +201,6 @@ namespace NzbDrone.Core.MetadataSource.OpenLibrary
         }
 
         // ── ISearchForNewEntity ───────────────────────────────────────────
-
         public List<object> SearchForNewEntity(string title)
         {
             var books = SearchForNewBook(title, null, false);
@@ -225,7 +220,6 @@ namespace NzbDrone.Core.MetadataSource.OpenLibrary
         }
 
         // ── Private search helpers ────────────────────────────────────────
-
         private List<Book> SearchOL(string query, bool getAllEditions)
         {
             try
@@ -304,7 +298,6 @@ namespace NzbDrone.Core.MetadataSource.OpenLibrary
         }
 
         // ── Mapping ───────────────────────────────────────────────────────
-
         private Author MapAuthor(OLAuthorResource resource, List<OLWorkResource> works)
         {
             var authorId = ExtractOlId(resource.Key);
@@ -339,12 +332,19 @@ namespace NzbDrone.Core.MetadataSource.OpenLibrary
                 AddDbIds(authorId, book, authorDict);
             }
 
+            var seriesList = books
+                .SelectMany(b => b.SeriesLinks.Value ?? new List<SeriesBookLink>())
+                .Select(l => l.Series.Value)
+                .Where(s => s != null)
+                .DistinctBy(s => s.ForeignSeriesId)
+                .ToList();
+
             return new Author
             {
                 Metadata = metadata,
                 CleanName = Parser.Parser.CleanAuthorName(metadata.Name),
                 Books = books,
-                Series = new List<Series>()
+                Series = seriesList
             };
         }
 
@@ -432,7 +432,53 @@ namespace NzbDrone.Core.MetadataSource.OpenLibrary
             book.Ratings = new Ratings { Votes = 0, Value = 0 };
             book.AnyEditionOk = true;
 
+            var seriesLinks = MapSeriesLinks(resource, book);
+            book.SeriesLinks = seriesLinks;
+
             return book;
+        }
+
+        private static List<SeriesBookLink> MapSeriesLinks(OLWorkResource work, Book book)
+        {
+            var links = new List<SeriesBookLink>();
+            if (work.Series == null || !work.Series.Any())
+            {
+                return links;
+            }
+
+            foreach (var seriesRef in work.Series)
+            {
+                var seriesId = ExtractOlId(seriesRef.SeriesKey?.Key);
+                if (seriesId.IsNullOrWhiteSpace())
+                {
+                    continue;
+                }
+
+                var series = new Series
+                {
+                    ForeignSeriesId = seriesId,
+                    Title = seriesId,
+                    ForeignAuthorId = null
+                };
+
+                var link = new SeriesBookLink
+                {
+                    Position = seriesRef.Position ?? string.Empty,
+                    IsPrimary = true,
+                    Series = series,
+                    Book = book
+                };
+
+                // Parse numeric sort key from position (e.g. "7.1" → 7)
+                if (int.TryParse(seriesRef.Position?.Split('.')[0], out var posInt))
+                {
+                    link.SeriesPosition = posInt;
+                }
+
+                links.Add(link);
+            }
+
+            return links;
         }
 
         private static Edition MapEdition(OLEditionResource resource, OLWorkResource work)
@@ -584,7 +630,6 @@ namespace NzbDrone.Core.MetadataSource.OpenLibrary
         }
 
         // ── DB enrichment (same logic as original BookInfoProxy) ──────────
-
         private void AddDbIds(string authorId, Book book, Dictionary<string, AuthorMetadata> authors)
         {
             var dbBook = _bookService.FindById(book.ForeignBookId);
@@ -635,8 +680,8 @@ namespace NzbDrone.Core.MetadataSource.OpenLibrary
         }
 
         // ── HTTP helpers ──────────────────────────────────────────────────
-
-        private T FetchJson<T>(string path) where T : class
+        private T FetchJson<T>(string path)
+            where T : class
         {
             var url = BaseUrl + path;
             var request = new HttpRequest(url);

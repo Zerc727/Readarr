@@ -15,16 +15,28 @@ namespace NzbDrone.Core.MetadataSource.OpenLibrary.Resources
         public OLTextValue Description { get; set; }
 
         [JsonPropertyName("covers")]
-        public List<int> Covers { get; set; } = new();
+        public List<int> Covers { get; set; } = new List<int>();
 
         [JsonPropertyName("subjects")]
-        public List<string> Subjects { get; set; } = new();
+        public List<string> Subjects { get; set; } = new List<string>();
 
         [JsonPropertyName("authors")]
-        public List<OLWorkAuthorRef> Authors { get; set; } = new();
+        public List<OLWorkAuthorRef> Authors { get; set; } = new List<OLWorkAuthorRef>();
 
         [JsonPropertyName("links")]
-        public List<OLLink> Links { get; set; } = new();
+        public List<OLLink> Links { get; set; } = new List<OLLink>();
+
+        [JsonPropertyName("series")]
+        public List<OLWorkSeriesRef> Series { get; set; } = new List<OLWorkSeriesRef>();
+    }
+
+    public class OLWorkSeriesRef
+    {
+        [JsonPropertyName("series")]
+        public OLKeyRef SeriesKey { get; set; }
+
+        [JsonPropertyName("position")]
+        public string Position { get; set; }
     }
 
     public class OLWorkAuthorRef
@@ -42,7 +54,7 @@ namespace NzbDrone.Core.MetadataSource.OpenLibrary.Resources
     public class OLWorkEditionsResponse
     {
         [JsonPropertyName("entries")]
-        public List<OLEditionResource> Entries { get; set; } = new();
+        public List<OLEditionResource> Entries { get; set; } = new List<OLEditionResource>();
 
         [JsonPropertyName("size")]
         public int Size { get; set; }

@@ -15,16 +15,16 @@ namespace NzbDrone.Core.MetadataSource.OpenLibrary.Resources
         public OLTextValue Bio { get; set; }
 
         [JsonPropertyName("photos")]
-        public List<int> Photos { get; set; } = new();
+        public List<int> Photos { get; set; } = new List<int>();
 
         [JsonPropertyName("links")]
-        public List<OLLink> Links { get; set; } = new();
+        public List<OLLink> Links { get; set; } = new List<OLLink>();
     }
 
     public class OLAuthorWorksResponse
     {
         [JsonPropertyName("entries")]
-        public List<OLWorkResource> Entries { get; set; } = new();
+        public List<OLWorkResource> Entries { get; set; } = new List<OLWorkResource>();
 
         [JsonPropertyName("size")]
         public int Size { get; set; }
