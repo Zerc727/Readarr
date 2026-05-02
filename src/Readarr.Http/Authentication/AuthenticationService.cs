@@ -16,19 +16,18 @@ namespace Readarr.Http.Authentication
     public class AuthenticationService : IAuthenticationService
     {
         private static readonly Logger _authLogger = LogManager.GetLogger("Auth");
+        private readonly IConfigFileProvider _configFileProvider;
         private readonly IUserService _userService;
-
-        private static AuthenticationType AUTH_METHOD;
 
         public AuthenticationService(IConfigFileProvider configFileProvider, IUserService userService)
         {
+            _configFileProvider = configFileProvider;
             _userService = userService;
-            AUTH_METHOD = configFileProvider.AuthenticationMethod;
         }
 
         public User Login(HttpRequest request, string username, string password)
         {
-            if (AUTH_METHOD == AuthenticationType.None)
+            if (_configFileProvider.AuthenticationMethod == AuthenticationType.None)
             {
                 return null;
             }
@@ -49,7 +48,7 @@ namespace Readarr.Http.Authentication
 
         public void Logout(HttpContext context)
         {
-            if (AUTH_METHOD == AuthenticationType.None)
+            if (_configFileProvider.AuthenticationMethod == AuthenticationType.None)
             {
                 return;
             }
