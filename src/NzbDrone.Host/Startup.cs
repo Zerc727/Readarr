@@ -185,8 +185,10 @@ namespace NzbDrone.Host
                     policy.RequireAuthenticatedUser();
                 });
 
-                // Require auth on everything except those marked [AllowAnonymous]
-                options.FallbackPolicy = new AuthorizationPolicyBuilder("API")
+                // Require auth on everything except those marked [AllowAnonymous].
+                // FirstRunSetup is also accepted so the initial auth-setup PUT can
+                // reach the controller before any credentials exist.
+                options.FallbackPolicy = new AuthorizationPolicyBuilder("API", FirstRunSetupAuthenticationHandler.SchemeName)
                 .RequireAuthenticatedUser()
                 .Build();
             });
