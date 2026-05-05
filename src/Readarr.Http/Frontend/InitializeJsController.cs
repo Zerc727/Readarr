@@ -17,18 +17,11 @@ namespace Readarr.Http.Frontend
         private readonly IConfigFileProvider _configFileProvider;
         private readonly IAnalyticsService _analyticsService;
 
-        private static string _apiKey;
-        private static string _urlBase;
-        private string _generatedContent;
-
         public InitializeJsController(IConfigFileProvider configFileProvider,
                                       IAnalyticsService analyticsService)
         {
             _configFileProvider = configFileProvider;
             _analyticsService = analyticsService;
-
-            _apiKey = configFileProvider.ApiKey;
-            _urlBase = configFileProvider.UrlBase;
         }
 
         [HttpGet("/initialize.js")]
@@ -39,17 +32,12 @@ namespace Readarr.Http.Frontend
 
         private string GetContent()
         {
-            if (RuntimeInfo.IsProduction && _generatedContent != null)
-            {
-                return _generatedContent;
-            }
-
-            var urlBase = _urlBase;
+            var urlBase = _configFileProvider.UrlBase;
             var sb = new StringBuilder();
             sb.Append("window.Readarr = {");
             sb.Append($"\"urlBase\":{Js(urlBase)},");
             sb.Append($"\"apiRoot\":{Js(urlBase + "/api/v1")},");
-            sb.Append($"\"apiKey\":{Js(_apiKey)},");
+            sb.Append($"\"apiKey\":{Js(_configFileProvider.ApiKey)},");
             sb.Append($"\"release\":{Js(BuildInfo.Release)},");
             sb.Append($"\"version\":{Js(BuildInfo.Version.ToString())},");
             sb.Append($"\"instanceName\":{Js(_configFileProvider.InstanceName)},");
@@ -60,8 +48,7 @@ namespace Readarr.Http.Frontend
             sb.Append($"\"isProduction\":{(RuntimeInfo.IsProduction ? "true" : "false")}");
             sb.Append("};");
 
-            _generatedContent = sb.ToString();
-            return _generatedContent;
+            return sb.ToString();
         }
 
         private static string Js(string value) => JsonSerializer.Serialize(value);

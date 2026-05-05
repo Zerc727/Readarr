@@ -43,10 +43,24 @@ namespace Readarr.Http.Authentication
                 return Task.FromResult(AuthenticateResult.Fail("Authorization code not formatted properly."));
             }
 
-            var authBase64 = Encoding.UTF8.GetString(Convert.FromBase64String(authHeaderRegex.Replace(authorizationHeader, "$1")));
+            string authBase64;
+            try
+            {
+                authBase64 = Encoding.UTF8.GetString(Convert.FromBase64String(authHeaderRegex.Replace(authorizationHeader, "$1")));
+            }
+            catch (FormatException)
+            {
+                return Task.FromResult(AuthenticateResult.Fail("Authorization header contains invalid Base64."));
+            }
+
             var authSplit = authBase64.Split(':', 2);
             var authUsername = authSplit[0];
-            var authPassword = authSplit.Length > 1 ? authSplit[1] : throw new Exception("Unable to get password");
+            var authPassword = authSplit.Length > 1 ? authSplit[1] : null;
+
+            if (authPassword == null)
+            {
+                return Task.FromResult(AuthenticateResult.Fail("Authorization header is missing password."));
+            }
 
             var user = _authService.Login(Request, authUsername, authPassword);
 

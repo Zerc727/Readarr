@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NzbDrone.Common;
@@ -16,18 +17,11 @@ namespace Readarr.Http.Frontend
         private readonly IConfigFileProvider _configFileProvider;
         private readonly IAnalyticsService _analyticsService;
 
-        private static string _apiKey;
-        private static string _urlBase;
-        private string _generatedContent;
-
         public InitializeJsonController(IConfigFileProvider configFileProvider,
-                                      IAnalyticsService analyticsService)
+                                        IAnalyticsService analyticsService)
         {
             _configFileProvider = configFileProvider;
             _analyticsService = analyticsService;
-
-            _apiKey = configFileProvider.ApiKey;
-            _urlBase = configFileProvider.UrlBase;
         }
 
         [HttpGet("/initialize.json")]
@@ -38,29 +32,24 @@ namespace Readarr.Http.Frontend
 
         private string GetContent()
         {
-            if (RuntimeInfo.IsProduction && _generatedContent != null)
-            {
-                return _generatedContent;
-            }
-
-            var builder = new StringBuilder();
-            builder.AppendLine("{");
-            builder.AppendLine($"  \"apiRoot\": \"{_urlBase}/api/v1\",");
-            builder.AppendLine($"  \"apiKey\": \"{_apiKey}\",");
-            builder.AppendLine($"  \"release\": \"{BuildInfo.Release}\",");
-            builder.AppendLine($"  \"version\": \"{BuildInfo.Version.ToString()}\",");
-            builder.AppendLine($"  \"instanceName\": \"{_configFileProvider.InstanceName.ToString()}\",");
-            builder.AppendLine($"  \"theme\": \"{_configFileProvider.Theme.ToString()}\",");
-            builder.AppendLine($"  \"branch\": \"{_configFileProvider.Branch.ToLower()}\",");
-            builder.AppendLine($"  \"analytics\": {_analyticsService.IsEnabled.ToString().ToLowerInvariant()},");
-            builder.AppendLine($"  \"userHash\": \"{HashUtil.AnonymousToken()}\",");
-            builder.AppendLine($"  \"urlBase\": \"{_urlBase}\",");
-            builder.AppendLine($"  \"isProduction\": {RuntimeInfo.IsProduction.ToString().ToLowerInvariant()}");
-            builder.AppendLine("}");
-
-            _generatedContent = builder.ToString();
-
-            return _generatedContent;
+            var urlBase = _configFileProvider.UrlBase;
+            var sb = new StringBuilder();
+            sb.AppendLine("{");
+            sb.AppendLine($"  \"apiRoot\": {Js(urlBase + "/api/v1")},");
+            sb.AppendLine($"  \"apiKey\": {Js(_configFileProvider.ApiKey)},");
+            sb.AppendLine($"  \"release\": {Js(BuildInfo.Release)},");
+            sb.AppendLine($"  \"version\": {Js(BuildInfo.Version.ToString())},");
+            sb.AppendLine($"  \"instanceName\": {Js(_configFileProvider.InstanceName)},");
+            sb.AppendLine($"  \"theme\": {Js(_configFileProvider.Theme)},");
+            sb.AppendLine($"  \"branch\": {Js(_configFileProvider.Branch.ToLower())},");
+            sb.AppendLine($"  \"analytics\": {_analyticsService.IsEnabled.ToString().ToLowerInvariant()},");
+            sb.AppendLine($"  \"userHash\": {Js(HashUtil.AnonymousToken())},");
+            sb.AppendLine($"  \"urlBase\": {Js(urlBase)},");
+            sb.AppendLine($"  \"isProduction\": {RuntimeInfo.IsProduction.ToString().ToLowerInvariant()}");
+            sb.AppendLine("}");
+            return sb.ToString();
         }
+
+        private static string Js(string value) => JsonSerializer.Serialize(value);
     }
 }

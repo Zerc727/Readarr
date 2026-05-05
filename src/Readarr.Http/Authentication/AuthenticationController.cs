@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Claims;
@@ -39,7 +40,8 @@ namespace Readarr.Http.Authentication
 
             if (user == null)
             {
-                return Redirect($"~/login?returnUrl={returnUrl}&loginFailed=true");
+                var safeReturn = Url.IsLocalUrl(returnUrl) ? $"&returnUrl={Uri.EscapeDataString(returnUrl)}" : string.Empty;
+                return Redirect($"~/login?loginFailed=true{safeReturn}");
             }
 
             var claims = new List<Claim>

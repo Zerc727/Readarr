@@ -9,10 +9,12 @@ using NzbDrone.Common.Disk;
 using NzbDrone.Common.EnvironmentInfo;
 using NzbDrone.Core.Analytics;
 using NzbDrone.Core.Configuration;
+using NzbDrone.Core.Configuration.Events;
+using NzbDrone.Core.Messaging.Events;
 
 namespace Readarr.Http.Frontend.Mappers
 {
-    public class IndexHtmlMapper : HtmlMapperBase
+    public class IndexHtmlMapper : HtmlMapperBase, IHandle<ConfigFileSavedEvent>
     {
         // Matches the entire window.Readarr = { ... }; block regardless of how many
         // fields the template contains — [^}]* stops at the first closing brace so
@@ -70,6 +72,11 @@ namespace Readarr.Http.Frontend.Mappers
             _generatedIndexContent = text;
 
             return ToStream(text);
+        }
+
+        public void Handle(ConfigFileSavedEvent message)
+        {
+            _generatedIndexContent = null;
         }
 
         private string BuildWindowReadarrBlock()
