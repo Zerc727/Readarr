@@ -62,7 +62,7 @@ namespace NzbDrone.Core.Configuration
                     continue;
                 }
 
-                var equal = configValue.Value.ToString().Equals(currentValue.ToString());
+                var equal = configValue.Value.ToString().Equals(currentValue.ToString(), StringComparison.OrdinalIgnoreCase);
 
                 if (!equal)
                 {

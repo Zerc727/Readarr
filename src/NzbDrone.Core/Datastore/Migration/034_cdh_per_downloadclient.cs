@@ -5,7 +5,7 @@ using NzbDrone.Core.Datastore.Migration.Framework;
 
 namespace NzbDrone.Core.Datastore.Migration
 {
-    [Migration(158)]
+    [Migration(34)]
     public class cdh_per_downloadclient : NzbDroneMigrationBase
     {
         protected override void MainDbUpgrade()
