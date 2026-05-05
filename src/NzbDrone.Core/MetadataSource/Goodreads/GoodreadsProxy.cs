@@ -19,6 +19,11 @@ namespace NzbDrone.Core.MetadataSource.Goodreads
 
     public class GoodreadsProxy : IGoodreadsProxy, IProvideSeriesInfo, IProvideListInfo
     {
+        // Goodreads public API keys shared across the *arr ecosystem.
+        // The Goodreads API is deprecated; these keys may stop working at any time.
+        private const string GoodreadsApiKey = "dcX1YH52UMjs6lznO2MuSg";
+        private const string GoodreadsListApiKey = "T7rSxXydAsZg0dU3PJzFhw";
+
         private readonly ICachedHttpResponseService _cachedHttpClient;
         private readonly Logger _logger;
         private readonly IHttpRequestBuilderFactory _requestBuilder;
@@ -30,7 +35,7 @@ namespace NzbDrone.Core.MetadataSource.Goodreads
             _logger = logger;
 
             _requestBuilder = new HttpRequestBuilder("https://www.goodreads.com/{route}")
-                .AddQueryParam("key", new string("gSuM2Onzl6sjMU25HY1Xcd".Reverse().ToArray()))
+                .AddQueryParam("key", GoodreadsApiKey)
                 .AddQueryParam("_nc", "1")
                 .SetHeader("User-Agent", "Dalvik/1.6.0 (Linux; U; Android 4.1.2; GT-I9100 Build/JZO54K)")
                 .KeepAlive()
@@ -73,7 +78,7 @@ namespace NzbDrone.Core.MetadataSource.Goodreads
             _logger.Debug("Getting List with GoodreadsId of {0}", foreignListId);
 
             var httpRequest = new HttpRequestBuilder("https://www.goodreads.com/book/list/listopia.xml")
-                .AddQueryParam("key", new string("whFzJP3Ud0gZsAdyXxSr7T".Reverse().ToArray()))
+                .AddQueryParam("key", GoodreadsListApiKey)
                 .AddQueryParam("_nc", "1")
                 .AddQueryParam("format", "xml")
                 .AddQueryParam("id", foreignListId)

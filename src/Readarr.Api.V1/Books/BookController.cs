@@ -19,6 +19,7 @@ using NzbDrone.Core.Validation.Paths;
 using NzbDrone.Http.REST.Attributes;
 using NzbDrone.SignalR;
 using Readarr.Http;
+using Readarr.Http.REST;
 
 namespace Readarr.Api.V1.Books
 {
@@ -143,7 +144,13 @@ namespace Readarr.Api.V1.Books
         [HttpGet("{id:int}/overview")]
         public object Overview(int id)
         {
-            var overview = _editionService.GetEditionsByBook(id).Single(x => x.Monitored).Overview;
+            var edition = _editionService.GetEditionsByBook(id).FirstOrDefault(x => x.Monitored);
+            if (edition == null)
+            {
+                throw new NotFoundException();
+            }
+
+            var overview = edition.Overview;
             return new
             {
                 id,
@@ -183,8 +190,6 @@ namespace Readarr.Api.V1.Books
         [HttpPut("monitor")]
         public IActionResult SetBooksMonitored([FromBody]BooksMonitoredResource resource)
         {
-            _bookService.SetMonitored(resource.BookIds, resource.Monitored);
-
             if (resource.BookIds.Count == 1)
             {
                 _bookService.SetBookMonitored(resource.BookIds.First(), resource.Monitored);

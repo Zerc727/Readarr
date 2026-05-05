@@ -199,23 +199,10 @@ namespace NzbDrone.Core.Configuration
             }
         }
 
-        public AuthenticationType AuthenticationMethod
-        {
-            get
-            {
-                var enabled = _authOptions.Enabled ?? GetValueBoolean("AuthenticationEnabled", false, false);
-
-                if (enabled)
-                {
-                    SetValue("AuthenticationMethod", AuthenticationType.Basic);
-                    return AuthenticationType.Basic;
-                }
-
-                return Enum.TryParse<AuthenticationType>(_authOptions.Method, out var enumValue)
-                    ? enumValue
-                    : GetValueEnum("AuthenticationMethod", AuthenticationType.None);
-            }
-        }
+        public AuthenticationType AuthenticationMethod =>
+            Enum.TryParse<AuthenticationType>(_authOptions.Method, out var enumValue)
+                ? enumValue
+                : GetValueEnum("AuthenticationMethod", AuthenticationType.None);
 
         public AuthenticationRequiredType AuthenticationRequired =>
             Enum.TryParse<AuthenticationRequiredType>(_authOptions.Required, out var enumValue)
@@ -382,6 +369,13 @@ namespace NzbDrone.Core.Configuration
             if (EnableSsl && (GetValue("SslCertHash", string.Empty, false).IsNotNullOrWhiteSpace() || SslCertPath.IsNullOrWhiteSpace()))
             {
                 SetValue("EnableSsl", false);
+            }
+
+            // Migrate legacy AuthenticationEnabled=true to AuthenticationMethod=Basic
+            if (GetValueBoolean("AuthenticationEnabled", false, persist: false))
+            {
+                SetValue("AuthenticationMethod", AuthenticationType.Basic);
+                SetValue("AuthenticationEnabled", false);
             }
         }
 
