@@ -44,8 +44,13 @@ namespace Readarr.Api.V1.Config
 
             SharedValidator.RuleFor(c => c.Username).NotEmpty().When(c => c.AuthenticationMethod == AuthenticationType.Basic ||
                                                                           c.AuthenticationMethod == AuthenticationType.Forms);
-            SharedValidator.RuleFor(c => c.Password).NotEmpty().When(c => c.AuthenticationMethod == AuthenticationType.Basic ||
-                                                                          c.AuthenticationMethod == AuthenticationType.Forms);
+
+            // Password is required only on first-run (no user exists yet).  When a user
+            // already exists, an empty password means "keep the existing password".
+            SharedValidator.RuleFor(c => c.Password).NotEmpty().When(c =>
+                (c.AuthenticationMethod == AuthenticationType.Basic ||
+                 c.AuthenticationMethod == AuthenticationType.Forms)
+                && _userService.FindUser() == null);
 
             SharedValidator.RuleFor(c => c.PasswordConfirmation)
                 .Must((resource, p) => IsMatchingPassword(resource)).WithMessage("Must match Password");
@@ -73,7 +78,8 @@ namespace Readarr.Api.V1.Config
         {
             // When only auth fields are submitted (e.g. first-run setup modal), required
             // non-auth fields arrive as zero/empty.  Back-fill from the current config so
-            // validators don't fire on unrelated fields.
+            // validators don't fire on unrelated fields and existing values aren't silently
+            // overwritten with defaults.
             if (Request.Method == "PUT")
             {
                 foreach (var value in context.ActionArguments.Values)
@@ -90,6 +96,11 @@ namespace Readarr.Api.V1.Config
                             resource.Port = _configFileProvider.Port;
                         }
 
+                        if (resource.SslPort == 0)
+                        {
+                            resource.SslPort = _configFileProvider.SslPort;
+                        }
+
                         if (resource.BindAddress.IsNullOrWhiteSpace())
                         {
                             resource.BindAddress = _configFileProvider.BindAddress;
@@ -98,6 +109,26 @@ namespace Readarr.Api.V1.Config
                         if (resource.Branch.IsNullOrWhiteSpace())
                         {
                             resource.Branch = _configFileProvider.Branch;
+                        }
+
+                        if (resource.UrlBase == null)
+                        {
+                            resource.UrlBase = _configFileProvider.UrlBase;
+                        }
+
+                        if (resource.SslCertPath == null)
+                        {
+                            resource.SslCertPath = _configFileProvider.SslCertPath;
+                        }
+
+                        if (resource.SslCertPassword == null)
+                        {
+                            resource.SslCertPassword = _configFileProvider.SslCertPassword;
+                        }
+
+                        if (resource.UpdateScriptPath == null)
+                        {
+                            resource.UpdateScriptPath = _configFileProvider.UpdateScriptPath;
                         }
 
                         if (resource.BackupInterval == 0)
@@ -133,19 +164,13 @@ namespace Readarr.Api.V1.Config
 
         private bool IsMatchingPassword(HostConfigResource resource)
         {
-            var user = _userService.FindUser();
-
-            if (user != null && user.Password == resource.Password)
+            // Empty password = user is keeping their existing password (valid when a user exists).
+            if (resource.Password.IsNullOrWhiteSpace())
             {
-                return true;
+                return _userService.FindUser() != null;
             }
 
-            if (resource.Password == resource.PasswordConfirmation)
-            {
-                return true;
-            }
-
-            return false;
+            return resource.Password == resource.PasswordConfirmation;
         }
 
         protected override HostConfigResource GetResourceById(int id)
@@ -162,7 +187,7 @@ namespace Readarr.Api.V1.Config
             var user = _userService.FindUser();
 
             resource.Username = user?.Username ?? string.Empty;
-            resource.Password = user?.Password ?? string.Empty;
+            resource.Password = string.Empty;
             resource.PasswordConfirmation = string.Empty;
 
             return resource;

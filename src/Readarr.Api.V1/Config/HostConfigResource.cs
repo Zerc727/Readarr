@@ -88,7 +88,8 @@ namespace Readarr.Api.V1.Config
                 BackupFolder = configService.BackupFolder,
                 BackupInterval = configService.BackupInterval,
                 BackupRetention = configService.BackupRetention,
-                ApplicationUrl = configService.ApplicationUrl
+                ApplicationUrl = configService.ApplicationUrl,
+                TrustCgnatIpAddresses = model.TrustCgnatIpAddresses
             };
         }
     }
