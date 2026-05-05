@@ -209,7 +209,7 @@ namespace NzbDrone.Core.Download.Clients.Transmission
 
         private void AuthenticateClient(HttpRequestBuilder requestBuilder, TransmissionSettings settings, bool reauthenticate = false)
         {
-            var authKey = $"{requestBuilder.BaseUrl}:{settings.Password}";
+            var authKey = $"{requestBuilder.BaseUrl}:{settings.Password.SHA256Hash()}";
 
             var sessionId = _authSessionIDCache.Find(authKey);
 
