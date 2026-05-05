@@ -141,11 +141,18 @@ namespace NzbDrone.Core.Configuration
                     continue;
                 }
 
-                var equal = configValue.Value.ToString().Equals(currentValue.ToString());
+                var equal = configValue.Value.ToString().Equals(currentValue.ToString(), StringComparison.OrdinalIgnoreCase);
 
                 if (!equal)
                 {
-                    SetValue(configValue.Key.FirstCharToUpper(), configValue.Value.ToString());
+                    if (configValue.Value is Enum enumValue)
+                    {
+                        SetValue(configValue.Key.FirstCharToUpper(), enumValue);
+                    }
+                    else
+                    {
+                        SetValue(configValue.Key.FirstCharToUpper(), configValue.Value.ToString());
+                    }
                 }
             }
 
