@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using NzbDrone.Common.Http.Proxy;
+using NzbDrone.Core.ImportLists;
 using NzbDrone.Core.MediaFiles;
 using NzbDrone.Core.Qualities;
 using NzbDrone.Core.Security;
@@ -20,6 +21,7 @@ namespace NzbDrone.Core.Configuration
         bool EnableCompletedDownloadHandling { get; set; }
         bool AutoRedownloadFailed { get; set; }
         bool AutoRedownloadFailedFromInteractiveSearch { get; set; }
+        int CheckForFinishedDownloadInterval { get; set; }
 
         //Media Management
         bool AutoUnmonitorPreviouslyDownloadedBooks { get; set; }
@@ -59,6 +61,9 @@ namespace NzbDrone.Core.Configuration
         bool ShowRelativeDates { get; set; }
         bool EnableColorImpairedMode { get; set; }
         int UILanguage { get; set; }
+
+        //Import Lists
+        ImportListSyncLevelType ListSyncLevel { get; set; }
 
         //Internal
         bool CleanupMetadataImages { get; set; }

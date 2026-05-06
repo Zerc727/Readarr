@@ -6,6 +6,7 @@ using NLog;
 using NzbDrone.Common.EnsureThat;
 using NzbDrone.Common.Http.Proxy;
 using NzbDrone.Core.Configuration.Events;
+using NzbDrone.Core.ImportLists;
 using NzbDrone.Core.Languages;
 using NzbDrone.Core.MediaFiles;
 using NzbDrone.Core.Messaging.Events;
@@ -149,6 +150,13 @@ namespace NzbDrone.Core.Configuration
             get { return GetValueBoolean("AutoRedownloadFailedFromInteractiveSearch", true); }
 
             set { SetValue("AutoRedownloadFailedFromInteractiveSearch", value); }
+        }
+
+        public int CheckForFinishedDownloadInterval
+        {
+            get { return GetValueInt("CheckForFinishedDownloadInterval", 1); }
+
+            set { SetValue("CheckForFinishedDownloadInterval", value); }
         }
 
         public bool CreateEmptyAuthorFolders
@@ -358,6 +366,13 @@ namespace NzbDrone.Core.Configuration
             get { return GetValueInt("UILanguage", (int)Language.English); }
 
             set { SetValue("UILanguage", value); }
+        }
+
+        public ImportListSyncLevelType ListSyncLevel
+        {
+            get { return GetValueEnum("ListSyncLevel", ImportListSyncLevelType.Disabled); }
+
+            set { SetValue("ListSyncLevel", value); }
         }
 
         public bool CleanupMetadataImages
