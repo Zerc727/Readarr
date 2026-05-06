@@ -37,6 +37,8 @@ namespace NzbDrone.Core.Configuration
         bool AnalyticsEnabled { get; }
         string LogLevel { get; }
         string ConsoleLogLevel { get; }
+        string ConsoleLogFormat { get; }
+        bool LogDbEnabled { get; }
         bool LogSql { get; }
         int LogRotate { get; }
         bool FilterSentryEvents { get; }
@@ -216,6 +218,8 @@ namespace NzbDrone.Core.Configuration
 
         public string LogLevel => _logOptions.Level ?? GetValue("LogLevel", "debug").ToLowerInvariant();
         public string ConsoleLogLevel => _logOptions.ConsoleLevel ?? GetValue("ConsoleLogLevel", string.Empty, persist: false);
+        public string ConsoleLogFormat => _logOptions.ConsoleFormat ?? GetValue("ConsoleLogFormat", string.Empty, persist: false);
+        public bool LogDbEnabled => _logOptions.DbEnabled ?? GetValueBoolean("LogDbEnabled", true, persist: false);
 
         public string PostgresHost => _postgresOptions?.Host ?? GetValue("PostgresHost", string.Empty, persist: false);
         public string PostgresUser => _postgresOptions?.User ?? GetValue("PostgresUser", string.Empty, persist: false);

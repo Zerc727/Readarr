@@ -227,10 +227,13 @@ namespace NzbDrone.Host
 
             // instantiate the databases to initialize/migrate them
             _ = mainDatabaseFactory.Value;
-            _ = logDatabaseFactory.Value;
             _ = cacheDatabaseFactory.Value;
 
-            dbTarget.Register();
+            if (configFileProvider.LogDbEnabled)
+            {
+                _ = logDatabaseFactory.Value;
+                dbTarget.Register();
+            }
             SchemaBuilder.Initialize(container);
 
             if (OsInfo.IsNotWindows)

@@ -7,6 +7,8 @@ public class LogOptions
     public int? Rotate { get; set; }
     public bool? Sql { get; set; }
     public string ConsoleLevel { get; set; }
+    public string ConsoleFormat { get; set; }
+    public bool? DbEnabled { get; set; }
     public bool? AnalyticsEnabled { get; set; }
     public string SyslogServer { get; set; }
     public int? SyslogPort { get; set; }
