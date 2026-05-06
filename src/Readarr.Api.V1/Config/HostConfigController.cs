@@ -53,7 +53,9 @@ namespace Readarr.Api.V1.Config
                 && _userService.FindUser() == null);
 
             SharedValidator.RuleFor(c => c.PasswordConfirmation)
-                .Must((resource, p) => IsMatchingPassword(resource)).WithMessage("Must match Password");
+                .Must((resource, p) => resource.Password == resource.PasswordConfirmation)
+                .WithMessage("Must match Password")
+                .When(c => c.Password.IsNotNullOrWhiteSpace());
 
             SharedValidator.RuleFor(c => c.SslPort).ValidPort().When(c => c.EnableSsl);
             SharedValidator.RuleFor(c => c.SslPort).NotEqual(c => c.Port).When(c => c.EnableSsl);
@@ -160,17 +162,6 @@ namespace Readarr.Api.V1.Config
             }
 
             return cert != null;
-        }
-
-        private bool IsMatchingPassword(HostConfigResource resource)
-        {
-            // Empty password = user is keeping their existing password (valid when a user exists).
-            if (resource.Password.IsNullOrWhiteSpace())
-            {
-                return _userService.FindUser() != null;
-            }
-
-            return resource.Password == resource.PasswordConfirmation;
         }
 
         protected override HostConfigResource GetResourceById(int id)
