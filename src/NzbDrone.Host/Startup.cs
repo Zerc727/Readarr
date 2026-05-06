@@ -59,7 +59,11 @@ namespace NzbDrone.Host
             services.Configure<ForwardedHeadersOptions>(options =>
             {
                 options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost;
-                options.KnownNetworks.Clear();
+                options.KnownNetworks.Add(new IPNetwork(System.Net.IPAddress.Parse("10.0.0.0"), 8));
+                options.KnownNetworks.Add(new IPNetwork(System.Net.IPAddress.Parse("172.16.0.0"), 12));
+                options.KnownNetworks.Add(new IPNetwork(System.Net.IPAddress.Parse("192.168.0.0"), 16));
+                options.KnownNetworks.Add(new IPNetwork(System.Net.IPAddress.Parse("fc00::"), 7));
+                options.KnownNetworks.Add(new IPNetwork(System.Net.IPAddress.Parse("fe80::"), 10));
                 options.KnownProxies.Clear();
             });
 
@@ -185,12 +189,9 @@ namespace NzbDrone.Host
                     policy.RequireAuthenticatedUser();
                 });
 
-                // Require auth on everything except those marked [AllowAnonymous].
-                // FirstRunSetup is also accepted so the initial auth-setup PUT can
-                // reach the controller before any credentials exist.
-                options.FallbackPolicy = new AuthorizationPolicyBuilder("API", FirstRunSetupAuthenticationHandler.SchemeName)
-                .RequireAuthenticatedUser()
-                .Build();
+                options.FallbackPolicy = new AuthorizationPolicyBuilder("API")
+                    .RequireAuthenticatedUser()
+                    .Build();
             });
 
             services.AddAppAuthentication();

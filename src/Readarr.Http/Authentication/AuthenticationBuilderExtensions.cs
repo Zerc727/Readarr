@@ -65,9 +65,7 @@ namespace Readarr.Http.Authentication
                 {
                     options.HeaderName = "X-Api-Key";
                     options.QueryName = "access_token";
-                })
-                .AddScheme<AuthenticationSchemeOptions, FirstRunSetupAuthenticationHandler>(
-                    FirstRunSetupAuthenticationHandler.SchemeName, options => { });
+                });
         }
     }
 }
