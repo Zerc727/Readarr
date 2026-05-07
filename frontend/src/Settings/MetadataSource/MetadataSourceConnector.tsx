@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
@@ -11,7 +10,7 @@ const SECTION = 'metadataSource';
 
 function createMapStateToProps() {
   return createSelector(
-    (state) => state.settings.advancedSettings,
+    (state: { settings: { advancedSettings: boolean } }) => state.settings.advancedSettings,
     createSettingsSectionSelector(SECTION),
     (advancedSettings, sectionSettings) => {
       return {
@@ -29,7 +28,18 @@ const mapDispatchToProps = {
   dispatchClearPendingChanges: clearPendingChanges
 };
 
-class MetadataSourceConnector extends Component {
+interface MetadataSourceConnectorProps {
+  isSaving: boolean;
+  hasPendingChanges: boolean;
+  dispatchFetchMetadataSource: () => void;
+  dispatchSetMetadataSourceValue: (payload: { name: string; value: unknown }) => void;
+  dispatchSaveMetadataSource: () => void;
+  dispatchClearPendingChanges: (payload: { section: string }) => void;
+  onChildMounted: (saveCallback: () => void) => void;
+  onChildStateChange: (payload: { isSaving: boolean; hasPendingChanges: boolean }) => void;
+}
+
+class MetadataSourceConnector extends Component<MetadataSourceConnectorProps> {
 
   //
   // Lifecycle
@@ -45,7 +55,7 @@ class MetadataSourceConnector extends Component {
     onChildMounted(dispatchSaveMetadataSource);
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: MetadataSourceConnectorProps) {
     const {
       hasPendingChanges,
       isSaving,
@@ -70,7 +80,7 @@ class MetadataSourceConnector extends Component {
   //
   // Listeners
 
-  onInputChange = ({ name, value }) => {
+  onInputChange = ({ name, value }: { name: string; value: unknown }) => {
     this.props.dispatchSetMetadataSourceValue({ name, value });
   };
 
@@ -86,16 +96,5 @@ class MetadataSourceConnector extends Component {
     );
   }
 }
-
-MetadataSourceConnector.propTypes = {
-  isSaving: PropTypes.bool.isRequired,
-  hasPendingChanges: PropTypes.bool.isRequired,
-  dispatchFetchMetadataSource: PropTypes.func.isRequired,
-  dispatchSetMetadataSourceValue: PropTypes.func.isRequired,
-  dispatchSaveMetadataSource: PropTypes.func.isRequired,
-  dispatchClearPendingChanges: PropTypes.func.isRequired,
-  onChildMounted: PropTypes.func.isRequired,
-  onChildStateChange: PropTypes.func.isRequired
-};
 
 export default connect(createMapStateToProps, mapDispatchToProps)(MetadataSourceConnector);

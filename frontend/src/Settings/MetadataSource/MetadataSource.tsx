@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import React from 'react';
 import Alert from 'Components/Alert';
 import FieldSet from 'Components/FieldSet';
@@ -10,7 +9,15 @@ import LoadingIndicator from 'Components/Loading/LoadingIndicator';
 import { inputTypes, kinds } from 'Helpers/Props';
 import translate from 'Utilities/String/translate';
 
-function MetadataSource(props) {
+interface MetadataSourceProps {
+  isFetching: boolean;
+  error?: object;
+  settings: Record<string, unknown>;
+  hasSettings: boolean;
+  onInputChange: (change: { name: string; value: unknown }) => void;
+}
+
+function MetadataSource(props: MetadataSourceProps) {
   const {
     isFetching,
     error,
@@ -47,7 +54,7 @@ function MetadataSource(props) {
                   name="metadataSource"
                   helpText={translate('MetadataSourceHelpText')}
                   onChange={onInputChange}
-                  {...settings.metadataSource}
+                  {...settings.metadataSource as object}
                 />
               </FormGroup>
             </FieldSet>
@@ -56,13 +63,5 @@ function MetadataSource(props) {
     </div>
   );
 }
-
-MetadataSource.propTypes = {
-  isFetching: PropTypes.bool.isRequired,
-  error: PropTypes.object,
-  settings: PropTypes.object.isRequired,
-  hasSettings: PropTypes.bool.isRequired,
-  onInputChange: PropTypes.func.isRequired
-};
 
 export default MetadataSource;
