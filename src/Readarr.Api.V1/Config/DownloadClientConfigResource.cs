@@ -7,6 +7,7 @@ namespace Readarr.Api.V1.Config
     {
         public string DownloadClientWorkingFolders { get; set; }
 
+        public int CheckForFinishedDownloadInterval { get; set; }
         public bool EnableCompletedDownloadHandling { get; set; }
         public bool AutoRedownloadFailed { get; set; }
         public bool AutoRedownloadFailedFromInteractiveSearch { get; set; }
@@ -20,6 +21,7 @@ namespace Readarr.Api.V1.Config
             {
                 DownloadClientWorkingFolders = model.DownloadClientWorkingFolders,
 
+                CheckForFinishedDownloadInterval = model.CheckForFinishedDownloadInterval,
                 EnableCompletedDownloadHandling = model.EnableCompletedDownloadHandling,
                 AutoRedownloadFailed = model.AutoRedownloadFailed,
                 AutoRedownloadFailedFromInteractiveSearch = model.AutoRedownloadFailedFromInteractiveSearch
