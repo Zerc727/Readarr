@@ -1055,6 +1055,7 @@
   "UnableToLoadMetadata": "Unable to load Metadata",
   "UnableToLoadMetadataProfiles": "Unable to load Metadata Profiles",
   "UnableToLoadMetadataProviderSettings": "Unable to load Metadata Provider settings",
+  "UnableToLoadMetadataSourceSettings": "Unable to load Metadata Source settings",
   "UnableToLoadNamingSettings": "Unable to load Naming settings",
   "UnableToLoadNotifications": "Unable to load Notifications",
   "UnableToLoadQualities": "Unable to load qualities",

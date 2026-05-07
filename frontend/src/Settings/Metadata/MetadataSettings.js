@@ -3,6 +3,7 @@ import PageContent from 'Components/Page/PageContent';
 import PageContentBody from 'Components/Page/PageContentBody';
 import SettingsToolbarConnector from 'Settings/SettingsToolbarConnector';
 import translate from 'Utilities/String/translate';
+import MetadataSourceConnector from '../MetadataSource/MetadataSourceConnector';
 // import MetadatasConnector from './Metadata/MetadatasConnector';
 import MetadataProviderConnector from './MetadataProvider/MetadataProviderConnector';
 
@@ -14,7 +15,7 @@ class MetadataSettings extends Component {
   constructor(props, context) {
     super(props, context);
 
-    this._saveCallback = null;
+    this._saveCallbacks = [];
 
     this.state = {
       isSaving: false,
@@ -26,7 +27,7 @@ class MetadataSettings extends Component {
   // Listeners
 
   onChildMounted = (saveCallback) => {
-    this._saveCallback = saveCallback;
+    this._saveCallbacks.push(saveCallback);
   };
 
   onChildStateChange = (payload) => {
@@ -34,9 +35,7 @@ class MetadataSettings extends Component {
   };
 
   onSavePress = () => {
-    if (this._saveCallback) {
-      this._saveCallback();
-    }
+    this._saveCallbacks.forEach((cb) => cb());
   };
 
   //
@@ -56,6 +55,11 @@ class MetadataSettings extends Component {
         />
 
         <PageContentBody>
+          <MetadataSourceConnector
+            onChildMounted={this.onChildMounted}
+            onChildStateChange={this.onChildStateChange}
+          />
+
           <MetadataProviderConnector
             onChildMounted={this.onChildMounted}
             onChildStateChange={this.onChildStateChange}
