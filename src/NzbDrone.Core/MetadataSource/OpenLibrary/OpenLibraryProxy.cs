@@ -195,6 +195,7 @@ namespace NzbDrone.Core.MetadataSource.OpenLibrary
         {
             var books = SearchForNewBook(title, null);
             return books
+                .Where(x => x.Author?.Value != null)
                 .Select(x => x.Author.Value)
                 .DistinctBy(x => x.ForeignAuthorId)
                 .ToList();
@@ -207,7 +208,12 @@ namespace NzbDrone.Core.MetadataSource.OpenLibrary
             var result = new List<object>();
             foreach (var book in books)
             {
-                var bookAuthor = book.Author.Value;
+                var bookAuthor = book.Author?.Value;
+                if (bookAuthor == null)
+                {
+                    continue;
+                }
+
                 if (!result.Contains(bookAuthor))
                 {
                     result.Add(bookAuthor);

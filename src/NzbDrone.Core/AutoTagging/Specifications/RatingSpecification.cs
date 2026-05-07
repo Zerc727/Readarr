@@ -10,7 +10,7 @@ namespace NzbDrone.Core.AutoTagging.Specifications
         public RatingSpecificationValidator()
         {
             RuleFor(c => c.Min).GreaterThanOrEqualTo(0);
-            RuleFor(c => c.Max).GreaterThan(c => c.Min);
+            RuleFor(c => c.Max).GreaterThanOrEqualTo(c => c.Min);
         }
     }
 

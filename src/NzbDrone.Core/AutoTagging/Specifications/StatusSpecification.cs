@@ -32,7 +32,7 @@ namespace NzbDrone.Core.AutoTagging.Specifications
 
         protected override bool IsSatisfiedByWithoutNegate(Author author)
         {
-            return (int)author.Metadata.Value.Status == Value;
+            return (int)(author.Metadata?.Value?.Status ?? AuthorStatusType.Continuing) == Value;
         }
 
         public override NzbDroneValidationResult Validate()
