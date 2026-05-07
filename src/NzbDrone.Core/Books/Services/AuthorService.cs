@@ -31,6 +31,7 @@ namespace NzbDrone.Core.Books
         Dictionary<int, string> AllAuthorPaths();
         bool AuthorPathExists(string folder);
         void RemoveAddOptions(Author author);
+        void UpdateTags(int authorId, HashSet<int> tags);
     }
 
     public class AuthorService : IAuthorService
@@ -220,6 +221,14 @@ namespace NzbDrone.Core.Books
         public void RemoveAddOptions(Author author)
         {
             _authorRepository.SetFields(author, s => s.AddOptions);
+        }
+
+        public void UpdateTags(int authorId, HashSet<int> tags)
+        {
+            _cache.Clear();
+            var author = _authorRepository.Get(authorId);
+            author.Tags = tags;
+            _authorRepository.SetFields(author, s => s.Tags);
         }
 
         public Author UpdateAuthor(Author author)
