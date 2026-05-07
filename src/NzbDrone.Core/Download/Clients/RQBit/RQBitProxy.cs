@@ -75,8 +75,14 @@ namespace NzbDrone.Core.Download.Clients.RQBit
 
         public void RemoveTorrent(int id, bool deleteData, RQBitSettings settings)
         {
-            var request = BuildRequest(settings, $"/api/v3/torrents/{id}")
-                .Build();
+            var builder = BuildRequest(settings, $"/api/v3/torrents/{id}");
+
+            if (deleteData)
+            {
+                builder = builder.AddQueryParam("delete_files", "true");
+            }
+
+            var request = builder.Build();
             request.Method = HttpMethod.Delete;
             _httpClient.Execute(request);
         }

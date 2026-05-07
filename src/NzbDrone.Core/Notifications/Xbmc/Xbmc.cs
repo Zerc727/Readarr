@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using FluentValidation.Results;
 using NLog;
 using NzbDrone.Core.Books;
+using NzbDrone.Core.MediaFiles;
 
 namespace NzbDrone.Core.Notifications.Xbmc
 {
@@ -63,6 +64,16 @@ namespace NzbDrone.Core.Notifications.Xbmc
         public override void OnImportFailure(BookDownloadMessage message)
         {
             _proxy.SendNotification(IMPORT_FAILURE_TITLE, message.Message, Settings);
+        }
+
+        public override void OnRename(Author author, List<RenamedBookFile> renamedFiles)
+        {
+            _proxy.SendNotification("Books Renamed", author.Name, Settings);
+        }
+
+        public override void OnBookRetag(BookRetagMessage message)
+        {
+            _proxy.SendNotification(BOOK_RETAGGED_TITLE, message.Message, Settings);
         }
 
         public override void OnApplicationUpdate(ApplicationUpdateMessage updateMessage)

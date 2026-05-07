@@ -67,9 +67,19 @@ namespace NzbDrone.Core.Download.Clients.Freebox
         public void RemoveDownload(int id, bool deleteData, FreeboxSettings settings)
         {
             var token = GetSessionToken(settings);
-            var request = BuildRequest(settings, $"/api/v6/downloads/{id}", token).Build();
-            request.Method = HttpMethod.Delete;
-            _httpClient.Execute(request);
+
+            if (deleteData)
+            {
+                var eraseRequest = BuildRequest(settings, $"/api/v6/downloads/{id}/erase", token).Build();
+                eraseRequest.Method = HttpMethod.Post;
+                _httpClient.Execute(eraseRequest);
+            }
+            else
+            {
+                var request = BuildRequest(settings, $"/api/v6/downloads/{id}", token).Build();
+                request.Method = HttpMethod.Delete;
+                _httpClient.Execute(request);
+            }
         }
 
         private string GetSessionToken(FreeboxSettings settings)
